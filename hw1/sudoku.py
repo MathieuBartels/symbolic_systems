@@ -81,8 +81,8 @@ def main():
         if verbose:
             print("Solving sudoku using recursion and propagation..");
             timer.start();
-        with suppress_stdout_stderr():
-            solved_sudoku = solve_sudoku_prop(sudoku,k);
+        # with suppress_stdout_stderr():
+        solved_sudoku = solve_sudoku_prop(sudoku,k);
         if verbose:
             timer.stop();
 
@@ -229,7 +229,7 @@ class suppress_stdout_stderr(object):
 ### Solver that uses recursion and propagation
 ###
 def solve_sudoku_prop(sudoku,k):
-
+    print('init solution')
     # Initialize data structure
     sudoku_possible_values = [];
     for row in sudoku:
@@ -311,12 +311,13 @@ def solve_sudoku_prop(sudoku,k):
 
     # Recursive function to solve the sudoku, using propagate()
     def solve_recursively(sudoku_possible_values):
+    
         # Check if we ran into a contradiction:
         if contradiction(sudoku_possible_values):
             return None;
         else:
             # Propagate
-            propagate(sudoku_possible_values,k);
+            sudoku_possible_values = propagate(sudoku_possible_values,k);
             # Check for contradictions
             if contradiction(sudoku_possible_values):
                 return None;
