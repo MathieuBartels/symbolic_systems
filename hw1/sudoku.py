@@ -45,7 +45,7 @@ def main():
         if verbose:
             print("Solving sudoku using the SAT encoding..");
             timer.start();
-        with suppress_stdout_stderr():
+        # with suppress_stdout_stderr():
             solved_sudoku = solve_sudoku_SAT(sudoku,k);
         if verbose:
             timer.stop();
