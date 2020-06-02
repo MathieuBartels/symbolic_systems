@@ -76,13 +76,17 @@ def solve_sudoku_SAT(sudoku,k):
     propositions = np.array(propositions).reshape((k2, k2, k2))
     rules = CNF()
 
-    ## first rule each entry has a value, if it is set, that value must be True
+    ## Axiom trues
     for i, row in enumerate(sudoku):
         for j, item in enumerate(row):
             props = list(propositions[i,j])
-            rules.append([int(item) for item in props])
             if item > 0:
                 rules.append([int(props[item-1])])
+
+     ## first rule each entry has a value, if it is set, that value must be True
+    for i, row in enumerate(sudoku):
+        for j, item in enumerate(row):
+            rules.append([int(item) for item in propositions[i,j, :]])
 
     ## second rule each row value appears once
     for y in range(k2):
@@ -111,15 +115,35 @@ def solve_sudoku_SAT(sudoku,k):
                             rules.append([-int(item) for item in props])
 
                         for l in range(x+1, k):
-                            for m in range(1, k):
+                            for m in range(0, k):
                                 props = [propositions[k*i+x, k*j+y, z], propositions[k*i+l, k*j+m, z]]
                                 rules.append([-int(item) for item in props])
 
-    for rule in rules:
-        for axiom in rule:
-            if axiom == 0:
-                print('true')
-                print(axiom)
+    ## There is at most one number in each entry
+    for y in range(k2):
+        for x in range(k2):
+            for z in range(k2-1):
+                for i in range(z+1, k2):
+                    props = [propositions[x, y, z], propositions[x, y, i]]
+                    rules.append([-int(item) for item in props])
+    
+    ## each number appears at least once in row and column and 3x3
+    for y in range(k2):
+        for z in range(k2):
+            rules.append([int(item) for item in propositions[:, y, z]])
+            
+    for x in range(k2):
+        for z in range(k2):
+            rules.append([int(item) for item in propositions[x, :, z]])
+
+    for i in range(k): # x block
+        for j in range(k): # y block
+            for x in range(k): # x place in block
+                for y in range(k): # y place in block
+                    rules.append([int(item) for item in propositions[k*i + x, k*j+y, :]])
+    # print("Number of rules in total", len(rules))
+    # formulas = CNF()
+    # [formulas.append(rule) for rule in rules]
 
     solver = MinisatGH();
     solver.append_formula(rules);
